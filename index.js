@@ -71,10 +71,12 @@ const start = async function(){
         
             mqttClientAccess(token, ()=>{
                 var lines = stdout.split('\n');
+                var count = 0;
                 lines.map(line => {
                     if(line && !line.startsWith('List of devices attached')){
                         const words = line.split(' ');
                         const deviceId = words[0];
+                        count++;
                         const os = 'android';
                         var model = 'unknown'
                         words.map(m=>{
@@ -82,9 +84,13 @@ const start = async function(){
                                 model = m.replace('model:', '');
                         });
                         
-                        deviceStatus(token, os, deviceId, model);
+                        deviceStart(token, os, deviceId, model);
                     }
                 })
+                if(count == 0){
+                    console.log('No devices are connected check your adb');
+                    process.exit();
+                }
             });
         });
     });
@@ -110,7 +116,15 @@ const req = async (token, path, callback) => {
     });
 }
 
-const deviceStatus = async (token, os, deviceId, model) => {
+/**
+ * 
+ * 
+ * @param {*} token 
+ * @param {*} os 
+ * @param {*} deviceId 
+ * @param {*} model 
+ */
+const deviceStart = async (token, os, deviceId, model) => {
     const appium_server_key = `${deviceId}_appium_server`;
     var default_appium_server = 'http://127.0.0.1:4723';
     if(property.value[appium_server_key])
@@ -119,27 +133,56 @@ const deviceStatus = async (token, os, deviceId, model) => {
     
     readline.question(q, async (appium_server)=>{
         appium_server = appium_server || default_appium_server;
-        readline.close();
+        property.set(appium_server_key, appium_server);
+        setTimeout(deviceStatus, 2000, token, deviceId, appium_server, os, model);
+    });
+};
+
+/**
+ * 다음 상태를 체크한다.
+ * 1. appium 서버가 떠있는지
+ * 2. adb로 하드웨어가 연결되어있는지
+ * 
+ * @param {*} token 
+ * @param {*} deviceId 
+ */
+const deviceStatus = async (token, deviceId, appium_server, os, model) => {
+    console.log(`checking status - ${deviceId}, ${appium_server}`);
+    var status_appium = false;
+    var status_connected = false;
+    exec('adb devices -l', (err, stdout, stderr) => {
+        var lines = stdout.split('\n');
+        lines.map(line => {
+            if(line && !line.startsWith('List of devices attached')){
+                const words = line.split(' ');
+                const lineDeviceId = words[0];
+                if(deviceId === lineDeviceId)
+                    status_connected = true;
+            }
+        })
+
         request({
             url: `${appium_server}/wd/hub/status`,
         },
         async function (err, resp, body) {
             if(err){
-                console.log('1. install node https://nodejs.org/');
-                console.log('2. npm i - g appium');
-                console.log('3. execute command appium');
+                
             } else {
+                status_appium = true;
                 const json = JSON.parse(body);
                 const v = json.value.build.version;
-                const status = 'FREE';
-                req(token, `/device/status?os=${os}&device_id=${deviceId}&model=${model}&appium_version=${v}&status=${status}`, function(json){
-                    property.set(appium_server_key, appium_server) 
+                req(token, `/device/status?os=${os}&device_id=${deviceId}&model=${model}&appium_version=${v}&status_appium=${status_appium}&status_connected=${status_connected}`, function(json){
+                    
                 });
             }
-        });
-    });
-}
 
+            setTimeout(deviceStatus, 60000, token, deviceId, appium_server, os, model);
+        });
+
+    });
+
+    
+};
 
 start();
 
