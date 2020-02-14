@@ -161,12 +161,14 @@ const deviceStatus = async (token, deviceId, appium_server, os, model) => {
             }
         })
 
+        if(!status_connected)
+            console.log(`Not connected - ${deviceId}`);
         request({
             url: `${appium_server}/wd/hub/status`,
         },
         async function (err, resp, body) {
             if(err){
-                
+                console.log(`No appium - ${deviceId} ${appium_server}`);
             } else {
                 status_appium = true;
                 const json = JSON.parse(body);
