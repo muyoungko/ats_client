@@ -147,7 +147,7 @@ const deviceStart = async (token, os, deviceId, model) => {
  * @param {*} deviceId 
  */
 const deviceStatus = async (token, deviceId, appium_server, os, model) => {
-    console.log(`checking status - ${deviceId}, ${appium_server}`);
+    console.log(`${new Date()} checking status - ${deviceId}, ${appium_server}`);
     var status_appium = false;
     var status_connected = false;
     exec('adb devices -l', (err, stdout, stderr) => {
@@ -173,7 +173,7 @@ const deviceStatus = async (token, deviceId, appium_server, os, model) => {
                 status_appium = true;
                 const json = JSON.parse(body);
                 const v = json.value.build.version;
-                req(token, `/device/status?os=${os}&device_id=${deviceId}&model=${model}&appium_version=${v}&status_appium=${status_appium}&status_connected=${status_connected}`, function(json){
+                req(token, `/device_status?os=${os}&device_id=${deviceId}&model=${model}&appium_version=${v}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}`, function(json){
                     
                 });
             }

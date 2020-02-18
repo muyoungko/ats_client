@@ -15,6 +15,8 @@ Mac의 경우
 * node 설치
 * npm i - g appium 설치
 * pip install Appium-Python
+   Appium-Python이 파이썬2에 설치되면, python3에서 그 모듈을 못찾는다. 만약 그렇다면, 다음과 같이 설치해야한다.
+   python3 -m pip install Appium-Python-Client
 
 윈도우의 경우
 * node 설치
