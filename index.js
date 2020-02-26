@@ -1,5 +1,3 @@
-
-
 const mqtt = require('mqtt');
 const config = require('./src/config');
 const request = require('request');
@@ -11,7 +9,7 @@ const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
 })
-
+const api = require('./src/api/api.js');
 
 const mqttClientAccess = (token, callback) => {
 
@@ -21,7 +19,7 @@ const mqttClientAccess = (token, callback) => {
     
             const options = {
                 host: config.mqtt_host,
-                port: config.mqtt_host_post,
+                port: config.mqtt_host_port,
                 protocol: 'mqtt',
             };
                 
@@ -36,9 +34,19 @@ const mqttClientAccess = (token, callback) => {
                 client.on('message', (topic, message, packet) => {
                     console.log("message is "+ message);
                     console.log("topic is "+ topic);
+
+                    const json = JSON.parse(message);
+                    if(json.path === '/test') {
+                        api.test(token, json);
+                    } else if(json.path === '/test') {
+
+                    }
                 });
                 callback();
             });
+        } else {
+            console.log('Auto Test Server not respond');
+            process.exit();
         }
     });
 }
@@ -85,6 +93,7 @@ const start = async function(){
                         });
                         
                         deviceStart(token, os, deviceId, model);
+
                     }
                 })
                 if(count == 0){
@@ -162,13 +171,13 @@ const deviceStatus = async (token, deviceId, appium_server, os, model) => {
         })
 
         if(!status_connected)
-            console.log(`Not connected - ${deviceId}`);
+            console.log(`Error - Not connected - ${deviceId}`);
         request({
             url: `${appium_server}/wd/hub/status`,
         },
         async function (err, resp, body) {
             if(err){
-                console.log(`No appium - ${deviceId} ${appium_server}`);
+                console.log(`Error - No appium - ${deviceId} ${appium_server}`);
             } else {
                 status_appium = true;
                 const json = JSON.parse(body);
