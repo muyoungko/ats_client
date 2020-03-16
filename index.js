@@ -4,7 +4,6 @@ const request = require('request');
 const wd = require('wd');
 const { exec } = require('child_process');
 const property = require('./src/property/property.js');
-var readlineSync = require('readline-sync');
 const readline = require('readline').createInterface({
     input: process.stdin,
     output: process.stdout
@@ -56,6 +55,8 @@ const start = async function(){
     console.log(`Get your client token in here - ${config.host}/#/token`);
     var previousToken = property.value.token;// || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJfbm8iOiIxNTgwNDYyMjYzODExIiwiZW1haWwiOiJtdXlvdW5na28xMXN0QGdtYWlsLmNvbSIsIm5hbWUiOiJtdXlvdW5na28xMXN0IiwidHlwZSI6InNsYWNrIiwicHJvZmlsZSI6Imh0dHBzOi8vc2VjdXJlLmdyYXZhdGFyLmNvbS9hdmF0YXIvOTk1OGE0YTVkZjJlYjMyNmNlNWEzZWZmOWM2NjNlNjguanBnP3M9MTkyJmQ9aHR0cHMlM0ElMkYlMkZhLnNsYWNrLWVkZ2UuY29tJTJGZGYxMGQlMkZpbWclMkZhdmF0YXJzJTJGYXZhXzAwMDktMTkyLnBuZyIsImlhdCI6MTU4MTMxMDE2NywiZXhwIjoxNjY3NzEwMTY3LCJpc3MiOiIqIiwic3ViIjoidXNlckluZm8ifQ.r2cU1CknU0lqb-3IzYx2de77q6sgmaaLPZKQrSe39Uk';
     
+    //TODO : Should Check JAVA_HOME
+
     var qm = '';
     if(previousToken)
         qm = `(default - ${previousToken.substring(0,10)}...)`
