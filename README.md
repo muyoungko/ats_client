@@ -24,6 +24,17 @@ If you want to use your own device, use 'Auto Test Client'
 $ npm -g i ats_client
 ```
 
+# Envirnonment Variable
+```shell
+$ vi ~/.bash_profile
+
+#add following two line
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_241.jdk/Contents/Home
+export ANDROID_HOME=/Users/a1100023/Library/Android/sdk
+
+$ source ~/.bash_profile
+```
+
 # Execution
 ```shell
 $ ats_client
