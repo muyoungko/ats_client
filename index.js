@@ -1,7 +1,7 @@
+#!/usr/bin/env node
 const mqtt = require('mqtt');
 const config = require('./src/config');
 const request = require('request');
-const wd = require('wd');
 const { exec } = require('child_process');
 const property = require('./src/property/property.js');
 const readline = require('readline').createInterface({

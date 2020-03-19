@@ -18,6 +18,9 @@ class Property {
     };
 
     load = function(){
+        if(!fs.existsSync('properties')) {
+            fs.writeFileSync('properties', '');
+        }
         var s = fs.readFileSync('properties').toString();
         const lines = s.split('\n');
         lines.map(l=>{
