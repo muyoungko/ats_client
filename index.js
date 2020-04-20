@@ -9,6 +9,7 @@ const readline = require('readline').createInterface({
     output: process.stdout
 })
 const api = require('./src/api/api.js');
+const topic = require('./src/mqtt/topic.js');
 
 const mqttClientAccess = (token, callback) => {
 
@@ -27,9 +28,9 @@ const mqttClientAccess = (token, callback) => {
             client.on("connect", () => {	
                 console.log("mqtt client connected "+ client.connected);
 
-                const topic = `${config.mqtt_topic}/${member_no}/#`;
-                console.log(`subscribing - ${topic}`);
-                client.subscribe(topic , {qos:1});
+                const topicName = topic.topicClientOfMember(member_no);
+                console.log(`subscribing - ${topicName}`);
+                client.subscribe(topicName , {qos:1});
                 client.on('message', (topic, message, packet) => {
                     console.log("message is "+ message);
                     console.log("topic is "+ topic);
@@ -93,6 +94,7 @@ const start = async function(){
                                 model = m.replace('model:', '');
                         });
                         
+                        console.log('Everything ok');
                         deviceStart(token, os, deviceId, model);
 
                     }

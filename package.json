@@ -1,11 +1,12 @@
 {
   "name": "ats_client",
-  "version": "0.0.11",
+  "version": "0.0.12",
   "description": "ats_client",
   "main": "index.js",
   "bin": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "NODE_ENV=development node index.js"
   },
   "repository": {
     "type": "git",
