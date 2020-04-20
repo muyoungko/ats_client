@@ -32,12 +32,12 @@ const mqttClientAccess = (token, callback) => {
                 console.log(`subscribing - ${topicName}`);
                 client.subscribe(topicName , {qos:1});
                 client.on('message', (topic, message, packet) => {
-                    console.log("message is "+ message);
                     console.log("topic is "+ topic);
+                    console.log("message is "+ message);
 
                     const json = JSON.parse(message);
                     if(json.path === '/test') {
-                        api.test(token, json);
+                        api.test(member_no, token, json);
                     } else if(json.path === '/test') {
 
                     }
