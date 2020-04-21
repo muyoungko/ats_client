@@ -14,8 +14,13 @@ If you want to use your own device, use 'Auto Test Client'
     $ npm i - g appium
     ```
 * pip install Appium-Python
+
     ```shell
     $ pip install Appium-Python
+    ```   
+* pip install requests    
+    ```shell
+    $ pip install requests
     ```   
 * Install Android Studio at https://developer.android.com/studio/install
 * iOS is preparing...

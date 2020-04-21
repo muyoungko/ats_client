@@ -24,8 +24,12 @@ const test = async (member_no, token, json) => {
     const test_session_id = json.test_session_id;
     req(token, `/test_session_pop/${test_session_id}`, (json)=>{
         if(json.r){
-            const code = json.data.code
-            const device = json.data.device
+            var code = json.data.code
+
+            //test_session_id
+            code = code.replace(/__TOKEN__/gi, token)
+            .replace(/__API_HOST__/gi, config.api_host)
+            .replace(/__TEST_SESSION_ID__/gi, test_session_id); 
 
             /*
                 파이썬2에 자꾸 설치되서 python3에서 못찾음 다음과 같이 설치해야한다.
@@ -43,15 +47,21 @@ const test = async (member_no, token, json) => {
                 if (err) {
                     console.log('-------------------------------err------------------------------');
                     console.log(Object.keys(err));
-                    console.log(err);
+                    // console.log('executable', err.executable);
+                    // console.log('options', err.options);
+                    // console.log('script', err.script);
+                    // console.log('args', err.args);
                     body.message = err.message;
                     body.traceback = err.traceback;
                 } else {
+                    //코드가 syntex오류가 실패한다면 실패 할 때까지 출력된 로그가 results에 수집되지 않는다.
+                    //TODO : 실패 로그를 수집해야한다.
                     body.results = results;
                     console.log('-------------------------------success------------------------------');
+                    console.log('--------------------------results-----------------------------------');
+                    console.log(results)
                 };
-                //console.log(output);
-                console.log('-------------------------------------------------------------');
+                
 
                 request({
                     url: config.api_host + `/test_session_complete/${test_session_id}`,
@@ -63,13 +73,7 @@ const test = async (member_no, token, json) => {
                     method: 'POST',
                     body:body,
                 },
-                async function (err, resp, body) {
-                    publishToFront(member_no, JSON.stringify({
-                            test_session_id:test_session_id, 
-                            status:`complete`,
-                            msg:`${device}의 테스트가 완료되었습니다`, 
-                        }
-                        ), ()=>{});
+                async (err, resp, body) => {
                 });
             });
 
@@ -77,6 +81,8 @@ const test = async (member_no, token, json) => {
                 // received a message sent from the Python script (a simple "print" statement)
                 console.log(message);
               });
+        } else {
+            console.log('Test session is already poped');
         }
     });
 }
