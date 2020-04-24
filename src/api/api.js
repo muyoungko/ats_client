@@ -51,25 +51,31 @@ const test = async (member_no, token, json) => {
                 let pyshell = new PythonShell(filename, options);
                 var results = [];
                 var traceback = [];
+                var traceback_line = 0;
                 pyshell.on('message', function (message) {
                     // received a message sent from the Python script (a simple "print" statement)
                     console.log(' result ', message);
-                    results.push(message);
-                    
-                    request({
-                        url: config.api_host + `/test_session_log/${test_session_id}`,
-                        headers: {
-                            'x-access-token': token,
-                            'content-type':'application/json'
-                        },
-                        json:true,
-                        method: 'POST',
-                        body:{
-                            log : message
-                        },
-                    }, async (err, resp, body) => {
-
-                    });
+                    if(message.startsWith('__ERROR__')){
+                        traceback.push(message.replace('__ERROR__', ''));
+                    } else if(message.startsWith('__LINE__')){
+                        traceback_line = parseInt(message.replace('__LINE__', ''));
+                    } else {
+                        results.push(message);
+                        request({
+                            url: config.api_host + `/test_session_log/${test_session_id}`,
+                            headers: {
+                                'x-access-token': token,
+                                'content-type':'application/json'
+                            },
+                            json:true,
+                            method: 'POST',
+                            body:{
+                                log : message
+                            },
+                        }, async (err, resp, body) => {
+    
+                        });
+                    }
                 })
                 .on('stderr', function (stderr) {
                     console.log(' stderr ', stderr);
@@ -88,7 +94,8 @@ const test = async (member_no, token, json) => {
                         method: 'POST',
                         body:{
                             success : traceback.length == 0,
-                            results:results, traceback:traceback
+                            results:results, traceback:traceback,
+                            traceback_line : traceback_line
                         },
                     }, async (err, resp, body) => {
 

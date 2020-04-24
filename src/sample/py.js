@@ -10,7 +10,7 @@ let options = {
 const code = 
 
 `
-import sys
+import sys, os
 
 def console() :
     print('console : ')
@@ -24,7 +24,15 @@ print('start new ')
 a = 1 + 1
 print(a)
 
-console()
+# console()
+try :
+    sdklfjsljf
+except Exception as ex:
+    print('__ERROR__' + str(ex))
+    exc_type, exc_obj, exc_tb = sys.exc_info()
+    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+    print('__LINE__' + str(exc_tb.tb_lineno))
+    
 
 `
 
