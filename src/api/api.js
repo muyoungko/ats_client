@@ -2,6 +2,7 @@ const {PythonShell} = require('python-shell');
 const request = require('request');
 const config = require('../config.js');
 const {publishToFront} = require('../mqtt/publish.js');
+const sessionManager = require('../test_session/SessionManager.js');
 
 const req = async (token, path, callback) => {
     request({
@@ -49,16 +50,30 @@ const test = async (member_no, token, json) => {
                 fs.writeFileSync(filename, code, 'utf8')            
                 
                 let pyshell = new PythonShell(filename, options);
+                sessionManager.putSession(test_session_id, pyshell);
                 var results = [];
                 var traceback = [];
                 var traceback_line = 0;
                 pyshell.on('message', function (message) {
                     // received a message sent from the Python script (a simple "print" statement)
-                    console.log(' result ', message);
+                    console.log(` result ${test_session_id}`, message);
                     if(message.startsWith('__ERROR__')){
                         traceback.push(message.replace('__ERROR__', ''));
                     } else if(message.startsWith('__LINE__')){
                         traceback_line = parseInt(message.replace('__LINE__', ''));
+                    } else if(message.startsWith('__CONSOLE__')){
+                        request({
+                            url: config.api_host + `/test_session_console/${test_session_id}`,
+                            headers: {
+                                'x-access-token': token,
+                                'content-type':'application/json'
+                            },
+                            json:true,
+                            method: 'POST',
+                            body:{status:'start'},
+                        }, async (err, resp, body) => {
+    
+                        });
                     } else {
                         results.push(message);
                         request({
@@ -81,27 +96,29 @@ const test = async (member_no, token, json) => {
                     console.log(' stderr ', stderr);
                     traceback.push(stderr);
                 })
-                .end(function (err) {
-                    console.log(' end ', err);
-                    console.log('python finished');
-                    request({
-                        url: config.api_host + `/test_session_complete/${test_session_id}`,
-                        headers: {
-                            'x-access-token': token,
-                            'content-type':'application/json'
-                        },
-                        json:true,
-                        method: 'POST',
-                        body:{
-                            success : traceback.length == 0,
-                            results:results, traceback:traceback,
-                            traceback_line : traceback_line
-                        },
-                    }, async (err, resp, body) => {
-
-                    });
-                });;
-            
+                .on('close', function (stderr) {
+                    pyshell.end(function (err) {
+                        console.log(' end ', err);
+                        console.log('python finished');
+                        sessionManager.removeSession(test_session_id);
+                        request({
+                            url: config.api_host + `/test_session_complete/${test_session_id}`,
+                            headers: {
+                                'x-access-token': token,
+                                'content-type':'application/json'
+                            },
+                            json:true,
+                            method: 'POST',
+                            body:{
+                                success : traceback.length == 0,
+                                results:results, traceback:traceback,
+                                traceback_line : traceback_line
+                            },
+                        }, async (err, resp, body) => {
+    
+                        });
+                    })
+                })
             }catch(e){
                 console.log(' try - catch ', e);
             }

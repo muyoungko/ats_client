@@ -10,6 +10,7 @@ const readline = require('readline').createInterface({
 })
 const api = require('./src/api/api.js');
 const topic = require('./src/mqtt/topic.js');
+const sessionManager = require('./src/test_session/SessionManager.js');
 
 const mqttClientAccess = (token, callback) => {
 
@@ -38,8 +39,9 @@ const mqttClientAccess = (token, callback) => {
                     const json = JSON.parse(message);
                     if(json.path === '/test') {
                         api.test(member_no, token, json);
-                    } else if(json.path === '/test') {
-
+                    } else if(json.path === '/query') {
+                        const pyshell = sessionManager.getSession(json.test_session_id);
+                        pyshell.send(json.command);
                     }
                 });
                 callback();

@@ -21,18 +21,7 @@ def console() :
         exec(input)
 
 print('start new ')
-a = 1 + 1
-print(a)
-
-# console()
-try :
-    sdklfjsljf
-except Exception as ex:
-    print('__ERROR__' + str(ex))
-    exc_type, exc_obj, exc_tb = sys.exc_info()
-    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-    print('__LINE__' + str(exc_tb.tb_lineno))
-    
+console()
 
 `
 
@@ -46,7 +35,7 @@ const sleep = (ms) => {
 const start = async () =>{
     console.log('script runnging...');
 
-    const filename = `var/f.py`; 
+    const filename = `var/console.py`; 
     fs = require('fs');
     fs.writeFileSync(filename, code, 'utf8')
 
@@ -111,14 +100,15 @@ const start = async () =>{
     pyshell.send(`exit`)
 
     await sleep(1000)
+
+    console.log('------end------')
+
     // pyshell.end(function (err,code,signal) {
     //     if (err) throw err;
     //     console.log('The exit code was: ' + code);
     //     console.log('The exit signal was: ' + signal);
     //     console.log('finished');
     // });
-
-    console.log('------end------')
 }
 
 
