@@ -1,6 +1,14 @@
 const fs = require('fs');
 
 class Property {
+    constructor() { 
+        if (!Property.instance) { 
+            Property.instance = this;
+            Property.instance.load();
+        } 
+        return Property.instance 
+    } 
+
     value = {loaded:false};
     set = function(k, v){
         this.value[k] = v;
@@ -32,5 +40,4 @@ class Property {
     };
 }
 const p = new Property()
-p.load();
 module.exports = p;

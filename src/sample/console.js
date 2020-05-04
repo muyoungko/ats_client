@@ -13,7 +13,6 @@ const code =
 import sys, os
 
 def console() :
-    print('console : ')
     while True:
         input = sys.stdin.readline()
         if input.startswith('exit') :

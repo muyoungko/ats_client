@@ -3,30 +3,50 @@ const request = require('request');
 const config = require('../config.js');
 const {publishToFront} = require('../mqtt/publish.js');
 const sessionManager = require('../test_session/SessionManager.js');
+const client = require('../api/client.js');
 
-const req = async (token, path, callback) => {
-    request({
-        url: config.api_host + path,
-        headers: {
-            'x-access-token': token
-        },
-    },
-    async function (err, resp, body) {
-        if(err)
-            callback(null);
-        else {
-            const json = JSON.parse(body);
-            callback(json);
-        }
+const appiumSessionTerminateToFront = async (device_id) => {
+    console.log('appiumSessionTerminateToFront');
+    client.req(`/device_status_terminate?device_id=${device_id}`, async (err, resp, body) => {
+
     });
+}
+
+// appium 세션 유지를 위해 http://127.0.0.1:4723/wd/hub/sessions로 자동 체크 를 해야하나?
+// /wd/hub/sessions http요청은 현재 세션의 newCommandTimeout 를 리셋시키지 못한다. 
+// 반면 /wd/hub/session/[세션ID]는 세션이 newCommandTimeout를 리셋시켜 현재 세션이 유지가 된다. 
+// /wd/hub/sessions로 세션 아이디를 가져온 다음
+// 콘솔 명령어를 날리기전에 /wd/hub/session 커맨드로 해당 세션을 연장시키자
+// 또한 sessions로 해당 세션이 살아 있는지 폴링 방식으로 감지한 후 서버에 매번 전달해줘야 한다.
+const appiumSessionChecker = async (device_id, appium_session_id) => {
+    console.log(`appiumSessionChecker start ${device_id}`);
+    if(sessionManager.getCurrectAppiumSessonId(device_id)){
+        client.reqAppium(device_id, '/wd/hub/sessions', async (err, resp, body) => {
+            if(err){
+                appiumSessionTerminateToFront(device_id);
+            } else {
+                const json = JSON.parse(body);
+                if(json.value && json.value.length > 0 && json.value[json.value.length-1].id === sessionManager.getCurrectAppiumSessonId(device_id)) {
+                    console.log(`appiumSessionChecker alive ${device_id}`);
+                    setTimeout(appiumSessionChecker, 10000, device_id, appium_session_id);
+                } else { 
+                    appiumSessionTerminateToFront(device_id);
+                }
+            }
+        })
+    } else {
+        console.log(`appiumSessionChecker end ${device_id}`);
+    }
 }
 
 const test = async (member_no, token, json) => {
     const test_session_id = json.test_session_id;
-    req(token, `/test_session_pop/${test_session_id}`, (json)=>{
+
+    client.req(`/test_session_pop/${test_session_id}`, (json)=>{
         if(json.r){
             try{
                 var code = json.data.code
+                const device_id = json.data.device_id;
 
                 //test_session_id
                 code = code.replace(/__TOKEN__/gi, token)
@@ -74,7 +94,11 @@ const test = async (member_no, token, json) => {
                         }, async (err, resp, body) => {
     
                         });
-                    } else {
+                    } else if(message.startsWith('__SESSION__')) {
+                        const appium_session_id = message.replace('__SESSION__', '');
+                        sessionManager.setCurrectAppiumSessonId(device_id, appium_session_id)
+                        appiumSessionChecker(device_id, appium_session_id);
+                    } else if(message) {
                         results.push(message);
                         request({
                             url: config.api_host + `/test_session_log/${test_session_id}`,
@@ -98,7 +122,6 @@ const test = async (member_no, token, json) => {
                 })
                 .on('close', function (stderr) {
                     pyshell.end(function (err) {
-                        console.log(' end ', err);
                         console.log('python finished');
                         sessionManager.removeSession(test_session_id);
                         request({

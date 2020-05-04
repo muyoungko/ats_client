@@ -9,12 +9,13 @@ const readline = require('readline').createInterface({
     output: process.stdout
 })
 const api = require('./src/api/api.js');
+const client = require('./src/api/client.js');
 const topic = require('./src/mqtt/topic.js');
 const sessionManager = require('./src/test_session/SessionManager.js');
 
 const mqttClientAccess = (token, callback) => {
 
-    req(token, '/token/me', function(json){
+    client.req('/token/me', function(json){
         if(json){
             const member_no = json.member_no
     
@@ -111,25 +112,6 @@ const start = async function(){
         
 };
 
-
-
-const req = async (token, path, callback) => {
-    request({
-        url: config.api_host + path,
-        headers: {
-            'x-access-token': token
-        },
-    },
-    async function (err, resp, body) {
-        if(err)
-            callback(null);
-        else {
-            const json = JSON.parse(body);
-            callback(json);
-        }
-    });
-}
-
 /**
  * 
  * 
@@ -177,20 +159,20 @@ const deviceStatus = async (token, deviceId, appium_server, os, model) => {
 
         if(!status_connected)
             console.log(`Error - Not connected - ${deviceId}`);
-        request({
-            url: `${appium_server}/wd/hub/status`,
-        },
+        client.reqAppium(deviceId, `/wd/hub/status`, 
         async function (err, resp, body) {
+            var v = '0';
             if(err){
                 console.log(`Error - No appium - ${deviceId} ${appium_server}`);
             } else {
                 status_appium = true;
                 const json = JSON.parse(body);
-                const v = json.value.build.version;
-                req(token, `/device_status?os=${os}&device_id=${deviceId}&model=${model}&appium_version=${v}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}`, function(json){
-                    
-                });
+                v = json.value.build.version;
             }
+
+            client.req(`/device_status?os=${os}&device_id=${deviceId}&model=${model}&appium_version=${v}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}`, function(json){
+                    
+            });
 
             setTimeout(deviceStatus, 60000, token, deviceId, appium_server, os, model);
         });
