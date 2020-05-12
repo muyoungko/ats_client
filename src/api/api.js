@@ -19,7 +19,7 @@ const appiumSessionTerminateToFront = async (device_id) => {
 // 콘솔 명령어를 날리기전에 /wd/hub/session 커맨드로 해당 세션을 연장시키자
 // 또한 sessions로 해당 세션이 살아 있는지 폴링 방식으로 감지한 후 서버에 매번 전달해줘야 한다.
 const appiumSessionChecker = async (device_id, appium_session_id) => {
-    console.log(`appiumSessionChecker start ${device_id}`);
+    console.log(` ${device_id}`);
     if(sessionManager.getCurrectAppiumSessonId(device_id)){
         client.reqAppium(device_id, '/wd/hub/sessions', async (err, resp, body) => {
             if(err){
@@ -37,6 +37,10 @@ const appiumSessionChecker = async (device_id, appium_session_id) => {
     } else {
         console.log(`appiumSessionChecker end ${device_id}`);
     }
+}
+
+const execute_python = async (code, device_id) => {
+
 }
 
 const test = async (member_no, token, json) => {
@@ -120,6 +124,9 @@ const test = async (member_no, token, json) => {
                     console.log(' stderr ', stderr);
                     traceback.push(stderr);
                 })
+                .on('error', function (err) {
+                    console.log(' error ', err);
+                })
                 .on('close', function (stderr) {
                     pyshell.end(function (err) {
                         console.log('python finished');
@@ -150,6 +157,7 @@ const test = async (member_no, token, json) => {
         }
     });
 }
+
 
 module.exports = {
  test : test

@@ -15,7 +15,8 @@
   "author": "muyoungko",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/muyoungko/ats_client/issues"
+    "url": "https://github.com/muyoungko/ats_client/issues",
+    "email": "muyoungko@gmail.com"
   },
   "homepage": "https://github.com/muyoungko/ats_client#readme",
   "dependencies": {
@@ -33,9 +34,5 @@
     "ios",
     "mobile",
     "testscript"
-  ], 
-  "bugs": {
-    "url": "https://github.com/muyoungko/ats_client/issues",
-    "email": "muyoungko@gmail.com"
-  }
+  ]
 }
