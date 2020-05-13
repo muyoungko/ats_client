@@ -13,40 +13,47 @@ const client = require('./src/api/client.js');
 const topic = require('./src/mqtt/topic.js');
 const sessionManager = require('./src/test_session/SessionManager.js');
 
+
+var mqtt_client;
+const getMqttClientInstance = () => {
+    if(!mqtt_client){
+        const options = {
+            host: config.mqtt_host,
+            port: config.mqtt_host_port,
+            protocol: 'mqtt',
+        };
+        mqtt_client = mqtt.connect(options);
+    }
+    return mqtt_client;
+}
+
 const mqttClientAccess = (token, callback) => {
 
     client.req('/token/me', function(json){
         if(json){
             const member_no = json.member_no
-    
-            const options = {
-                host: config.mqtt_host,
-                port: config.mqtt_host_port,
-                protocol: 'mqtt',
-            };
-                
-            const client = mqtt.connect(options);
-            
-            client.on("connect", () => {	
-                console.log("mqtt client connected "+ client.connected);
-
-                const topicName = topic.topicClientOfMember(member_no);
-                console.log(`subscribing - ${topicName}`);
-                client.subscribe(topicName , {qos:1});
-                client.on('message', (topic, message, packet) => {
-                    console.log("topic is "+ topic);
-                    console.log("message is "+ message);
-
-                    const json = JSON.parse(message);
-                    if(json.path === '/test') {
-                        api.test(member_no, token, json);
-                    } else if(json.path === '/query') {
-                        const pyshell = sessionManager.getSession(json.test_session_id);
-                        pyshell.send(json.command);
-                    }
-                });
-                callback();
+            const mqtt_client = getMqttClientInstance();
+            mqtt_client.on("connect", () => {	
+                //console.log("mqtt client connected "+ mqtt_client.connected);
             });
+
+            const topicName = topic.topicClientOfMember(member_no);
+            console.log(`subscribing - ${topicName}`);
+            mqtt_client.subscribe(topicName , {qos:1});
+            mqtt_client.on('message', (topic, message, packet) => {
+                console.log("topic is "+ topic);
+                console.log("message is "+ message);
+
+                const json = JSON.parse(message);
+                if(json.path === '/test') {
+                    api.test(member_no, token, json);
+                } else if(json.path === '/query') {
+                    const pyshell = sessionManager.getSession(json.test_session_id);
+                    if(pyshell)
+                        pyshell.send(json.command);
+                }
+            });
+            callback();
         } else {
             console.log('Auto Test Server not respond');
             process.exit();
