@@ -5,11 +5,16 @@ const {publishToFront} = require('../mqtt/publish.js');
 const sessionManager = require('../test_session/SessionManager.js');
 const client = require('../api/client.js');
 
-const appiumSessionTerminateToFront = async (device_id) => {
+// 동일한 appium_session_id에 대해 두번이상 보내면 안된다.
+// 서버는 device_id에 의해서만 free - run이 정해진다.
+const appiumSessionIdsTerminated = {}
+const appiumSessionTerminateToFront = async (device_id, appium_session_id) => {
     console.log('appiumSessionTerminateToFront');
-    client.req(`/device_status_terminate?device_id=${device_id}`, async (err, resp, body) => {
-
-    });
+    if(!appiumSessionIdsTerminated[appium_session_id]){
+        console.log(`appiumSessionTerminateToFront ${appium_session_id} sent`);
+        await client.req_sync(`/device_status_terminate?device_id=${device_id}&appium_session_id=${appium_session_id}`);
+        appiumSessionIdsTerminated[appium_session_id] = appium_session_id;
+    }
 }
 
 // appium 세션 유지를 위해 http://127.0.0.1:4723/wd/hub/sessions로 자동 체크 를 해야하나?
@@ -23,14 +28,14 @@ const appiumSessionChecker = async (device_id, appium_session_id) => {
     if(sessionManager.getCurrectAppiumSessonId(device_id)){
         client.reqAppium(device_id, '/wd/hub/sessions', async (err, resp, body) => {
             if(err){
-                appiumSessionTerminateToFront(device_id);
+                appiumSessionTerminateToFront(device_id, appium_session_id);
             } else {
                 const json = JSON.parse(body);
                 if(json.value && json.value.length > 0 && json.value[json.value.length-1].id === sessionManager.getCurrectAppiumSessonId(device_id)) {
                     console.log(`appiumSessionChecker alive ${device_id}`);
                     setTimeout(appiumSessionChecker, 10000, device_id, appium_session_id);
                 } else { 
-                    appiumSessionTerminateToFront(device_id);
+                    appiumSessionTerminateToFront(device_id, appium_session_id);
                 }
             }
         })
@@ -128,9 +133,11 @@ const test = async (member_no, token, json) => {
                     console.log(' error ', err);
                 })
                 .on('close', function (stderr) {
-                    pyshell.end(function (err) {
+                    pyshell.end( async (err) =>{
                         console.log('python finished');
+                        const appium_session_id = sessionManager.getCurrectAppiumSessonId(device_id);
                         sessionManager.removeSession(test_session_id);
+                        await appiumSessionTerminateToFront(device_id, appium_session_id);
                         request({
                             url: config.api_host + `/test_session_complete/${test_session_id}`,
                             headers: {

@@ -13,15 +13,18 @@ If you want to use your own device, use 'Auto Test Client'
     ```shell
     $ npm i - g appium
     ```
-* pip install Appium-Python
-
+* python -m pip install Appium-Python-Client
     ```shell
-    $ pip install Appium-Python
+    $ python -m pip install Appium-Python-Client
     ```   
-* pip install requests    
+* python -m pip install requests    
     ```shell
-    $ pip install requests
+    $ python -m pip install requests
     ```   
+* python -m pip install Image
+    ```shell
+    $ python -m pip install Image
+    ```
 * Install Android Studio at https://developer.android.com/studio/install
 * iOS is preparing...
 
@@ -35,8 +38,8 @@ $ npm -g i ats_client
 $ vi ~/.bash_profile
 
 #add following two line
-export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_241.jdk/Contents/Home
-export ANDROID_HOME=/Users/a1100023/Library/Android/sdk
+export JAVA_HOME=/Library/Java/JavaVirtualMachines/jdk1.8.0_241.jdk/Contents/Home[Your Java Home]
+export ANDROID_HOME=/Users/[Your Mac Id]/Library/Android/sdk
 
 $ source ~/.bash_profile
 ```

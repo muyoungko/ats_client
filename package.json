@@ -1,7 +1,7 @@
 {
   "name": "ats_client",
-  "version": "0.0.19",
-  "description": "ats_client",
+  "version": "0.0.21",
+  "description": "Real Device Auto Tester for Android, iOS",
   "main": "index.js",
   "bin": "index.js",
   "scripts": {
@@ -24,7 +24,8 @@
     "python-shell": "^1.0.8",
     "readline": "^1.3.0",
     "readline-sync": "^1.4.10",
-    "request": "^2.88.0"
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5"
   },
   "devDependencies": {},
   "keywords": [
