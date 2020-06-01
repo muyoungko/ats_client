@@ -62,7 +62,8 @@ const mqttClientAccess = (token, callback) => {
 }
 
 const start = async function(){
-    console.log(`Welcome Auto Test Hub`);
+    const version = require("./package.json").version;
+    console.log(`Welcome Auto Test Hub - client version ${version}`);
     console.log(`Get your client token in here - ${config.host}/#/token`);
     var previousToken = property.value.token;// || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJfbm8iOiIxNTgwNDYyMjYzODExIiwiZW1haWwiOiJtdXlvdW5na28xMXN0QGdtYWlsLmNvbSIsIm5hbWUiOiJtdXlvdW5na28xMXN0IiwidHlwZSI6InNsYWNrIiwicHJvZmlsZSI6Imh0dHBzOi8vc2VjdXJlLmdyYXZhdGFyLmNvbS9hdmF0YXIvOTk1OGE0YTVkZjJlYjMyNmNlNWEzZWZmOWM2NjNlNjguanBnP3M9MTkyJmQ9aHR0cHMlM0ElMkYlMkZhLnNsYWNrLWVkZ2UuY29tJTJGZGYxMGQlMkZpbWclMkZhdmF0YXJzJTJGYXZhXzAwMDktMTkyLnBuZyIsImlhdCI6MTU4MTMxMDE2NywiZXhwIjoxNjY3NzEwMTY3LCJpc3MiOiIqIiwic3ViIjoidXNlckluZm8ifQ.r2cU1CknU0lqb-3IzYx2de77q6sgmaaLPZKQrSe39Uk';
     
