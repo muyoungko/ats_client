@@ -15,11 +15,11 @@ const sessionManager = require('./src/test_session/SessionManager.js');
 
 
 var mqtt_client;
-const getMqttClientInstance = () => {
+const getMqttClientInstance = (mqtt_host, mqtt_host_port) => {
     if(!mqtt_client){
         const options = {
-            host: config.mqtt_host,
-            port: config.mqtt_host_port,
+            host: mqtt_host,
+            port: mqtt_host_port,
             protocol: 'mqtt',
         };
         mqtt_client = mqtt.connect(options);
@@ -32,7 +32,7 @@ const mqttClientAccess = (token, callback) => {
     client.req('/token/me', function(json){
         if(json){
             const member_no = json.member_no
-            const mqtt_client = getMqttClientInstance();
+            const mqtt_client = getMqttClientInstance(json.mqtt_host, json.mqtt_host_port);
             mqtt_client.on("connect", () => {	
                 //console.log("mqtt client connected "+ mqtt_client.connected);
             });

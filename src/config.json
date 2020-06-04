@@ -1,14 +1,10 @@
 {
   "production": {
-    "mqtt_host": "broker.hivemq.com",
-    "mqtt_host_port": 1883,
     "mqtt_topic": "http://www.autotesthub.com",
     "host": "http://www.autotesthub.co.kr.s3-website.ap-northeast-2.amazonaws.com/",
     "api_host": "https://6dyif8jifd.execute-api.ap-northeast-2.amazonaws.com/production"
   },
   "development": {
-    "mqtt_host": "broker.hivemq.com",
-    "mqtt_host_port": 1883,
     "mqtt_topic": "http://development.autotesthub.com",
     "host": "http://localhost:3000",
     "api_host": "http://localhost:3110"

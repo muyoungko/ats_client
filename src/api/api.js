@@ -11,9 +11,9 @@ const appiumSessionIdsTerminated = {}
 const appiumSessionTerminateToFront = async (device_id, appium_session_id) => {
     console.log('appiumSessionTerminateToFront');
     if(!appiumSessionIdsTerminated[appium_session_id]){
+        appiumSessionIdsTerminated[appium_session_id] = appium_session_id;
         console.log(`appiumSessionTerminateToFront ${appium_session_id} sent`);
         await client.req_sync(`/device_status_terminate?device_id=${device_id}&appium_session_id=${appium_session_id}`);
-        appiumSessionIdsTerminated[appium_session_id] = appium_session_id;
     }
 }
 
