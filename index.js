@@ -12,7 +12,7 @@ const api = require('./src/api/api.js');
 const client = require('./src/api/client.js');
 const topic = require('./src/mqtt/topic.js');
 const sessionManager = require('./src/test_session/SessionManager.js');
-
+const Appium = require('appium')
 
 var mqtt_client;
 const getMqttClientInstance = (mqtt_host, mqtt_host_port) => {
@@ -62,12 +62,23 @@ const mqttClientAccess = (token, callback) => {
 }
 
 const start = async function(){
+
+    //const AppiumDoctor = require('appium-doctor')
+    //console.log('AppiumDoctor result');
+    //console.log('AppiumDoctor result' , AppiumDoctor);
+
+    process.stdin.setRawMode(true);
+    process.stdin.on("keypress", function(chunk, key) {
+    if(key && (key.name === "c" || key.name === "z") && key.ctrl) {
+        console.log("bye bye, all appium process is killed");
+        process.exit();
+    }
+    });
+    
     const version = require("./package.json").version;
     console.log(`Welcome Auto Test Hub - client version ${version}`);
     console.log(`Get your client token in here - ${config.host}/#/token`);
-    var previousToken = property.value.token;// || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJtZW1iZXJfbm8iOiIxNTgwNDYyMjYzODExIiwiZW1haWwiOiJtdXlvdW5na28xMXN0QGdtYWlsLmNvbSIsIm5hbWUiOiJtdXlvdW5na28xMXN0IiwidHlwZSI6InNsYWNrIiwicHJvZmlsZSI6Imh0dHBzOi8vc2VjdXJlLmdyYXZhdGFyLmNvbS9hdmF0YXIvOTk1OGE0YTVkZjJlYjMyNmNlNWEzZWZmOWM2NjNlNjguanBnP3M9MTkyJmQ9aHR0cHMlM0ElMkYlMkZhLnNsYWNrLWVkZ2UuY29tJTJGZGYxMGQlMkZpbWclMkZhdmF0YXJzJTJGYXZhXzAwMDktMTkyLnBuZyIsImlhdCI6MTU4MTMxMDE2NywiZXhwIjoxNjY3NzEwMTY3LCJpc3MiOiIqIiwic3ViIjoidXNlckluZm8ifQ.r2cU1CknU0lqb-3IzYx2de77q6sgmaaLPZKQrSe39Uk';
-    
-    //TODO : Should Check JAVA_HOME
+    var previousToken = property.value.token;
 
     var qm = '';
     if(previousToken)
@@ -82,43 +93,92 @@ const start = async function(){
         
         property.set('token', token);
         
-        exec('adb devices -l', (err, stdout, stderr) => {
-            if (err) {
-                console.log('adb command not found');
-                console.log('Please install android studio sdk');
-                console.log('Or export path like `export PATH=~/Library/Android/sdk/platform-tools:$PATH`')
-                return;
-            }
-        
-            mqttClientAccess(token, ()=>{
-                var lines = stdout.split('\n');
-                var count = 0;
-                lines.map(line => {
-                    if(line && !line.startsWith('List of devices attached')){
-                        const words = line.split(' ');
-                        const deviceId = words[0];
-                        count++;
-                        const os = 'android';
-                        var model = 'unknown'
-                        words.map(m=>{
-                            if(m.startsWith('model:'))
-                                model = m.replace('model:', '');
-                        });
-                        
-                        console.log('Everything ok');
-                        deviceStart(token, os, deviceId, model);
+        mqttClientAccess(token, ()=>{
 
-                    }
+            checkiOSorAndroidDevice(list=>{
+                var port = 8000;
+                list.map(m=>{
+                    deviceStart(token, m.os, m.deviceId, m.model, m.version, port++);
                 })
-                if(count == 0){
-                    console.log('No devices are connected check your adb');
-                    process.exit();
-                }
             });
         });
     });
         
 };
+
+const checkiOSorAndroidDevice = async (callback) => {
+    exec('adb devices -l', (err, stdout, stderr) => {
+        exec('instruments -s devices', (err2, stdout2, stderr2) => {
+            const r = [];
+            if(err && err2) {
+                console.log('Error', `Check your command 'adb' or command 'instruments' at least one`);
+                process.exit();
+            }
+
+            var lines = stdout.split('\n');
+            lines.map(line => {
+                if(line && !line.startsWith('List of devices attached')){
+                    const words = line.split(' ');
+                    const deviceId = words[0];
+                    const os = 'android';
+                    var model = 'unknown'
+                    words.map(m=>{
+                        if(m.startsWith('model:'))
+                            model = m.replace('model:', '');
+                    });
+                    
+                    console.log(`Android device found - ${model}(${deviceId})`);
+                    // r.push({
+                    //     os:os,
+                    //     deviceId:deviceId,
+                    //     model:model,
+                    // })
+                }
+            })
+
+            var lines2 = stdout2.split('\n');
+            lines2.map(line2 => {
+                if(line2 && !line2.startsWith('Known Devices:')
+                    && line2.includes('(') && !line2.includes('Simulator')){
+                    console.log(line2);
+                    const os = 'ios';
+
+                    var name = line2.split(' (')[0];
+                    var regExp = /\(([^)]+)\)/;
+                    var matches = regExp.exec(line2);
+                    var version = matches[0].substring(1, matches[0].length -1);
+                    var model = name;
+
+                    var regExp2 = /\[([^)]+)\]/;
+                    var matches2 = regExp2.exec(line2);
+                    var deviceId = matches2[0].substring(1, matches2[0].length -1);
+
+                    console.log(`iOS device found - ${model} ${version} (${deviceId})`);
+                    r.push({
+                        os:os,
+                        deviceId:deviceId,
+                        model:model,
+                        version:version,
+                    })
+                }
+            })
+            
+
+            if(r.length == 0){
+                console.log(`No devices are connected check your command 'adb decices -l' or command 'instruments -s devices'`);
+
+                // console.log('adb command not found');
+                // console.log('Please install android studio sdk');
+                // console.log('Or export path like `export PATH=~/Library/Android/sdk/platform-tools:$PATH`')
+
+                process.exit();
+            } else {
+                callback(r);
+            }
+        });
+    });
+};
+
 
 /**
  * 
@@ -128,18 +188,15 @@ const start = async function(){
  * @param {*} deviceId 
  * @param {*} model 
  */
-const deviceStart = async (token, os, deviceId, model) => {
+const deviceStart = async (token, os, deviceId, model, version, appium_port) => {
     const appium_server_key = `${deviceId}_appium_server`;
-    var default_appium_server = 'http://127.0.0.1:4723';
+    var appium_server_uri = `http://127.0.0.1:${appium_port}`;
     if(property.value[appium_server_key])
-        default_appium_server = property.value[appium_server_key];
-    var q = `Please enter the appium server for ${deviceId}(default ${default_appium_server}) : `;
-    
-    readline.question(q, async (appium_server)=>{
-        appium_server = appium_server || default_appium_server;
-        property.set(appium_server_key, appium_server);
-        setTimeout(deviceStatus, 2000, token, deviceId, appium_server, os, model);
-    });
+        appium_server_uri = property.value[appium_server_key];
+    console.log(`Appium Server Start For ${deviceId} - ${appium_server_uri}`)
+    const appium_server = await Appium.main({port:appium_port});
+    property.set(appium_server_key, appium_server_uri);
+    setTimeout(deviceStatus, 2000, token, deviceId, appium_server_uri, os, model, version);
 };
 
 /**
@@ -150,7 +207,7 @@ const deviceStart = async (token, os, deviceId, model) => {
  * @param {*} token 
  * @param {*} deviceId 
  */
-const deviceStatus = async (token, deviceId, appium_server, os, model) => {
+const deviceStatus = async (token, deviceId, appium_server, os, model, version) => {
     console.log(`${new Date()} checking status - ${deviceId}, ${appium_server}`);
     var status_appium = false;
     var status_connected = false;
@@ -178,7 +235,8 @@ const deviceStatus = async (token, deviceId, appium_server, os, model) => {
                 v = json.value.build.version;
             }
 
-            client.req(`/device_status?os=${os}&device_id=${deviceId}&model=${model}&appium_version=${v}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}`, function(json){
+            const path = `/device_status?os=${os}&device_id=${deviceId}&model=${encodeURI(model)}&appium_version=${v}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}&version=${version}`;
+            client.req(path, function(json){
                     
             });
 
