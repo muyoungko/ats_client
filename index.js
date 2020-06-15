@@ -13,6 +13,7 @@ const client = require('./src/api/client.js');
 const topic = require('./src/mqtt/topic.js');
 const sessionManager = require('./src/test_session/SessionManager.js');
 const Appium = require('appium')
+const fs = require('fs');
 
 var mqtt_client;
 const getMqttClientInstance = (mqtt_host, mqtt_host_port) => {
@@ -53,7 +54,7 @@ const mqttClientAccess = (token, callback) => {
                         pyshell.send(json.command);
                 }
             });
-            callback();
+            callback(json);
         } else {
             console.log('Auto Test Server not respond');
             process.exit();
@@ -110,27 +111,67 @@ const start = async function(){
         
         property.set('token', token);
         
-        mqttClientAccess(token, ()=>{
-
+        mqttClientAccess(token, (json)=>{
+            
             checkiOSorAndroidDevice(async list=>{
 
                 if(list.length == 0){
                     process.exit();
                 }
-                connectedDeviceList = list;
-                var port = 8000;
-                var system_port = 9000;
+
+                var iosStuck = false;
                 for(var i=0;i<list.length;i++){
                     const m = list[i];
-                    await deviceStart(token, m.os, m.deviceId, m.model, m.version, system_port++, port++);
+                    if(m.os == 'ios'){
+                        const default_xcode_org_id = json.default_xcode_org_id;
+                        const default_xcode_signing_id = json.default_xcode_signing_id;
+                        const xcode_org_id_key = `${m.deviceId}_xcode_org_id`;
+                        const xcode_signing_id_key = `${m.deviceId}_xcode_signing_id`;
+                        if(!property.value[xcode_org_id_key] || !property.value[xcode_signing_id_key]){
+                            iosStuck = true;
+                            console.log(
+`Please Entery your iphone certifications for .xccode file like following example 
+DEVELOPMENT_TEAM = 3675B8XJSV
+CODE_SIGN_IDENTITY = iPhone Developer`
+                            )
+                            var q = `Please enter the DEVELOPMENT_TEAM for(${m.deviceId}) ${default_xcode_org_id?'default('+default_xcode_org_id+')':''}:`;
+                            readline.question(q, async (xcode_org_id)=>{
+                                if(!xcode_org_id)
+                                    xcode_org_id = default_xcode_org_id
+                                property.set(xcode_org_id_key, xcode_org_id);
+                                var q = `Please enter the CODE_SIGN_IDENTITY for(${m.deviceId}) ${default_xcode_signing_id?'default('+default_xcode_signing_id+')':''}:`;
+                                readline.question(q, async (xcode_signing_id)=>{
+                                    if(!xcode_signing_id)
+                                        xcode_signing_id = default_xcode_signing_id
+                                    property.set(xcode_signing_id_key, xcode_signing_id);
+                                    massSetart(token, list);
+                                }); 
+                            });
+                        }
+                        break;
+                    }
                 }
 
-                setTimeout(updateConnectedDevice, 60000);
+                if(!iosStuck)
+                    await massSetart(token, list);
             });
         });
     });
 };
 
+const massSetart = async (token, list) => {
+    connectedDeviceList = list;
+    var port = 8000;
+    var system_port = 9000;
+    for(var i=0;i<list.length;i++){
+        const this_port = port++;
+        const this_system_port = system_port++;
+        const m = list[i];
+        await deviceStart(token, m.os, m.deviceId, m.model, m.version, this_system_port, this_port);
+    }
+
+    setTimeout(updateConnectedDevice, 60000);
+}
 
 const checkiOSorAndroidDevice = async (callback) => {
     exec('adb devices -l', (err, stdout, stderr) => {
@@ -219,7 +260,20 @@ const deviceStart = async (token, os, deviceId, model, version, system_port, app
         appium_server_uri = property.value[appium_server_key];
         appium_port = parseInt(appium_server_uri.split(':')[2]);
     }
-    console.log(`Appium Server Start For ${deviceId} - ${appium_server_uri}`)
+
+    const xcode_org_id_key = `${deviceId}_xcode_org_id`;
+    const xcode_signing_id_key = `${deviceId}_xcode_signing_id`;
+    const xcode_org_id = property.value[xcode_org_id_key];
+    const xcode_signing_id = property.value[xcode_signing_id_key];
+    const xcconfig_path =  `${__dirname}/.xcconfig`
+    const xcconfig =    
+`DEVELOPMENT_TEAM = ${xcode_org_id}
+CODE_SIGN_IDENTITY = ${xcode_signing_id}`
+    console.log(xcconfig_path)
+    fs.writeFileSync(xcconfig_path, xcconfig);
+
+    console.log(`Appium Server Start For ${deviceId} - ${appium_server_uri} iOS with ${xcode_org_id} / ${xcode_signing_id}`)
+
     const appium_server = await Appium.main({port:appium_port});
     property.set(appium_server_key, appium_server_uri);
     setTimeout(deviceStatus, 2000, token, deviceId, appium_server_uri, os, model, version, system_port);
