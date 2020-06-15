@@ -119,9 +119,10 @@ const start = async function(){
                 }
                 connectedDeviceList = list;
                 var port = 8000;
+                var system_port = 9000;
                 for(var i=0;i<list.length;i++){
                     const m = list[i];
-                    await deviceStart(token, m.os, m.deviceId, m.model, m.version, port++);
+                    await deviceStart(token, m.os, m.deviceId, m.model, m.version, system_port++, port++);
                 }
 
                 setTimeout(updateConnectedDevice, 60000);
@@ -211,7 +212,7 @@ const checkiOSorAndroidDevice = async (callback) => {
  * @param {*} deviceId 
  * @param {*} model 
  */
-const deviceStart = async (token, os, deviceId, model, version, appium_port) => {
+const deviceStart = async (token, os, deviceId, model, version, system_port, appium_port) => {
     const appium_server_key = `${deviceId}_appium_server`;
     var appium_server_uri = `http://127.0.0.1:${appium_port}`;
     if(property.value[appium_server_key]){
@@ -221,7 +222,7 @@ const deviceStart = async (token, os, deviceId, model, version, appium_port) => 
     console.log(`Appium Server Start For ${deviceId} - ${appium_server_uri}`)
     const appium_server = await Appium.main({port:appium_port});
     property.set(appium_server_key, appium_server_uri);
-    setTimeout(deviceStatus, 2000, token, deviceId, appium_server_uri, os, model, version);
+    setTimeout(deviceStatus, 2000, token, deviceId, appium_server_uri, os, model, version, system_port);
 };
 
 /**
@@ -232,7 +233,7 @@ const deviceStart = async (token, os, deviceId, model, version, appium_port) => 
  * @param {*} token 
  * @param {*} deviceId 
  */
-const deviceStatus = async (token, deviceId, appium_server, os, model, version) => {
+const deviceStatus = async (token, deviceId, appium_server, os, model, version, system_port) => {
     console.log(`${new Date()} checking status - ${deviceId}, ${appium_server}`);
     var status_appium = false;
     const d = getConnectedDevice(deviceId);
@@ -250,12 +251,12 @@ const deviceStatus = async (token, deviceId, appium_server, os, model, version) 
             appium_version = json.value.build.version;
         }
 
-        const path = `/device_status?os=${os}&device_id=${deviceId}&model=${encodeURI(model)}&appium_version=${appium_version}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}&version=${version}`;
+        const path = `/device_status?os=${os}&device_id=${deviceId}&model=${encodeURI(model)}&appium_version=${appium_version}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}&version=${version}&system_port=${system_port}`;
         client.req(path, function(json){
                 
         });
 
-        setTimeout(deviceStatus, 60000, token, deviceId, appium_server, os, model);
+        setTimeout(deviceStatus, 60000, token, deviceId, appium_server, os, model, system_port);
     });  
         
 };

@@ -86,9 +86,7 @@ const test = async (member_no, token, json) => {
                 pyshell.on('message', function (message) {
                     // received a message sent from the Python script (a simple "print" statement)
                     console.log(` result ${test_session_id}`, message);
-                    if(message.startsWith('__ERROR__')){
-                        traceback.push(message.replace('__ERROR__', ''));
-                    } else if(message.startsWith('__LINE__')){
+                    if(message.startsWith('__LINE__')){
                         traceback_line = parseInt(message.replace('__LINE__', ''));
                     } else if(message.startsWith('__CONSOLE__')){
                         request({
