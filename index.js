@@ -65,6 +65,7 @@ var connectedDeviceList = [];
 const updateConnectedDevice = () => {
     checkiOSorAndroidDevice( list => {
         connectedDeviceList = list;
+        console.log('connectedDeviceList', list.map(m=>m.deviceId));
         setTimeout(updateConnectedDevice, 60000);
     });
 }
@@ -112,16 +113,20 @@ const start = async function(){
         mqttClientAccess(token, ()=>{
 
             checkiOSorAndroidDevice(async list=>{
+
+                if(list.length == 0){
+                    process.exit();
+                }
                 connectedDeviceList = list;
                 var port = 8000;
                 for(var i=0;i<list.length;i++){
                     const m = list[i];
                     await deviceStart(token, m.os, m.deviceId, m.model, m.version, port++);
                 }
+
+                setTimeout(updateConnectedDevice, 60000);
             });
         });
-
-        setTimeout(updateConnectedDevice, 60000);
     });
 };
 
@@ -189,6 +194,7 @@ const checkiOSorAndroidDevice = async (callback) => {
                 // console.log('adb command not found');
                 // console.log('Please install android studio sdk');
                 // console.log('Or export path like `export PATH=~/Library/Android/sdk/platform-tools:$PATH`')
+                callback(r);
             } else {
                 callback(r);
             }
@@ -208,8 +214,10 @@ const checkiOSorAndroidDevice = async (callback) => {
 const deviceStart = async (token, os, deviceId, model, version, appium_port) => {
     const appium_server_key = `${deviceId}_appium_server`;
     var appium_server_uri = `http://127.0.0.1:${appium_port}`;
-    if(property.value[appium_server_key])
+    if(property.value[appium_server_key]){
         appium_server_uri = property.value[appium_server_key];
+        appium_port = parseInt(appium_server_uri.split(':')[2]);
+    }
     console.log(`Appium Server Start For ${deviceId} - ${appium_server_uri}`)
     const appium_server = await Appium.main({port:appium_port});
     property.set(appium_server_key, appium_server_uri);
@@ -242,7 +250,7 @@ const deviceStatus = async (token, deviceId, appium_server, os, model, version) 
             appium_version = json.value.build.version;
         }
 
-        const path = `/device_status?os=${os}&device_id=${deviceId}&model=${encodeURI(model)}&appium_version=${appium_version}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}&version=${d.version}`;
+        const path = `/device_status?os=${os}&device_id=${deviceId}&model=${encodeURI(model)}&appium_version=${appium_version}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}&version=${version}`;
         client.req(path, function(json){
                 
         });
