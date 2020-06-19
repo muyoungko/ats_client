@@ -1,9 +1,9 @@
 const request = require('request-promise');
 const config = require('../config');
-const {value} = require('../property/property.js');
+const property = require('../property/property.js');
 
 const req = async (path, callback) => {
-    const token = value.token;
+    const token = property.get('token');
     request({
         url: config.api_host + path,
         headers: {
