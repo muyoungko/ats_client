@@ -21,7 +21,7 @@ const req = async (path, callback) => {
 }
 
 const req_sync = async (path) => {
-    const token = value.token;
+    const token = property.get('token');
     return await request({
         url: config.api_host + path,
         headers: {
@@ -32,7 +32,8 @@ const req_sync = async (path) => {
 
 const reqAppium = async (deviceId, path, callback) => {
     const appium_server_key = `${deviceId}_appium_server`;
-    const url = value[appium_server_key] + path;
+    const appium_server = property.get(appium_server_key);
+    const url = appium_server + path;
     request({
         url: url,
     },

@@ -127,7 +127,7 @@ const start = async function(){
                         const default_xcode_signing_id = json.default_xcode_signing_id;
                         const xcode_org_id_key = `${m.deviceId}_xcode_org_id`;
                         const xcode_signing_id_key = `${m.deviceId}_xcode_signing_id`;
-                        if(!property.get('xcode_org_id_key') || !property.get('xcode_signing_id_key')){
+                        if(!property.get(xcode_org_id_key) || !property.get(xcode_signing_id_key)){
                             iosStuck = true;
                             console.log(
 `Please Entery your iphone certifications for .xccode file like following example 
@@ -256,15 +256,15 @@ const checkiOSorAndroidDevice = async (callback) => {
 const deviceStart = async (token, os, deviceId, model, version, system_port, appium_port) => {
     const appium_server_key = `${deviceId}_appium_server`;
     var appium_server_uri = `http://127.0.0.1:${appium_port}`;
-    if(property.get('appium_server_key')){
-        appium_server_uri = property.get('appium_server_key');
+    if(property.get(appium_server_key)){
+        appium_server_uri = property.get(appium_server_key);
         appium_port = parseInt(appium_server_uri.split(':')[2]);
     }
 
     const xcode_org_id_key = `${deviceId}_xcode_org_id`;
     const xcode_signing_id_key = `${deviceId}_xcode_signing_id`;
-    const xcode_org_id = property.get('xcode_org_id_key');
-    const xcode_signing_id = property.get('xcode_signing_id_key');
+    const xcode_org_id = property.get(xcode_org_id_key);
+    const xcode_signing_id = property.get(xcode_signing_id_key);
     const xcconfig_path =  `${__dirname}/.xcconfig`
     const xcconfig =    
 `DEVELOPMENT_TEAM = ${xcode_org_id}

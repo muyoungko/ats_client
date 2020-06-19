@@ -26,14 +26,16 @@ class Property {
             if(k)
                 s+= `${k}=${this._value[k]}\n`;
         });
-        fs.writeFileSync('properties', s);
+        const property_path =  `${__dirname}/.property`
+        fs.writeFileSync(property_path, s);
     };
 
     load(){
-        if(!fs.existsSync('properties')) {
-            fs.writeFileSync('properties', '');
+        const property_path =  `${__dirname}/.property`
+        if(!fs.existsSync(property_path)) {
+            fs.writeFileSync(property_path, '');
         }
-        var s = fs.readFileSync('properties').toString();
+        var s = fs.readFileSync(property_path).toString();
         const lines = s.split('\n');
         lines.map(l=>{
             const pv = l.split('=');
