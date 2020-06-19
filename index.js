@@ -276,7 +276,7 @@ CODE_SIGN_IDENTITY = ${xcode_signing_id}`
 
     const appium_server = await Appium.main({port:appium_port});
     property.set(appium_server_key, appium_server_uri);
-    setTimeout(deviceStatus, 2000, token, deviceId, appium_server_uri, os, model, version, system_port);
+    setTimeout(deviceStatus, 2000, token, deviceId, appium_server_uri, os, model, version, system_port, xcode_org_id, xcode_signing_id, xcconfig_path);
 };
 
 /**
@@ -287,7 +287,7 @@ CODE_SIGN_IDENTITY = ${xcode_signing_id}`
  * @param {*} token 
  * @param {*} deviceId 
  */
-const deviceStatus = async (token, deviceId, appium_server, os, model, version, system_port) => {
+const deviceStatus = async (token, deviceId, appium_server, os, model, version, system_port, xcode_org_id, xcode_signing_id, xcconfig_path) => {
     console.log(`${new Date()} checking status - ${deviceId}, ${appium_server}`);
     var status_appium = false;
     const d = getConnectedDevice(deviceId);
@@ -305,12 +305,13 @@ const deviceStatus = async (token, deviceId, appium_server, os, model, version, 
             appium_version = json.value.build.version;
         }
 
-        const path = `/device_status?os=${os}&device_id=${deviceId}&model=${encodeURI(model)}&appium_version=${appium_version}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}&version=${version}&system_port=${system_port}`;
+        const path = `/device_status?os=${os}&device_id=${deviceId}&model=${encodeURI(model)}&appium_version=${appium_version}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}&version=${version}&system_port=${system_port}`
+                    + `&xcode_org_id=${xcode_org_id}&xcode_signing_id=${xcode_signing_id}&xcconfig_path=${xcconfig_path}`;
         client.req(path, function(json){
                 
         });
 
-        setTimeout(deviceStatus, 60000, token, deviceId, appium_server, os, model, system_port);
+        setTimeout(deviceStatus, 60000, token, deviceId, appium_server, os, model, version, system_port, xcode_org_id, xcode_signing_id, xcconfig_path);
     });  
         
 };
