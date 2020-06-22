@@ -1,5 +1,4 @@
 # Auto Test Client
-# !This is under development!
 Auto test client is mobile phone auto test programs. 
 
 Create code with web console then execute or schedule it.
@@ -7,7 +6,15 @@ You can use your own device or using another's device.
 
 If you want to use your own device, use 'Auto Test Client'
 
-# instruction - OSX
+# pre condition
+python3 command should be available. 
+* $ python3
+adb command(Android Studio installed) should be available for Android Test 
+* $ adb
+instruments command(Xcode installed) should be available for iOS Test
+* $ instruments
+
+# instruction
 * Install node  at https://nodejs.org/ko/download/
 * Install appium 
     ```shell
