@@ -1,10 +1,15 @@
 # Auto Test Client
-Auto test client is mobile phone auto test programs. 
+
+This is under Developing, but service and function are always live.
+
+Auto test client is for test with real mobile phone which is your own device.
+
+Test Platform : http://www.autotesthub.co.kr.s3-website.ap-northeast-2.amazonaws.com/
 
 Create code with web console then execute or schedule it.
-You can use your own device or using another's device. 
+You can use your own device or another's public device. 
 
-If you want to use your own device, use 'Auto Test Client'
+If you want to use your own device, use this 'Auto Test Client'
 
 # pre condition
 python3 command should be available. 
