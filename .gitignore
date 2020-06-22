@@ -106,4 +106,4 @@ dist
 
 *.py
 .xcconfig
-.properties
+properties
