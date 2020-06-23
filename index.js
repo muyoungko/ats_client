@@ -134,12 +134,12 @@ const start = async function(){
 DEVELOPMENT_TEAM = 3675B8XJSV
 CODE_SIGN_IDENTITY = iPhone Developer`
                             )
-                            var q = `Please enter the DEVELOPMENT_TEAM for(${m.deviceId}) ${default_xcode_org_id?'default('+default_xcode_org_id+')':''}:`;
+                            var q = `Please enter the DEVELOPMENT_TEAM for device(${m.deviceId}) ${default_xcode_org_id?'default('+default_xcode_org_id+')':''}:`;
                             readline.question(q, async (xcode_org_id)=>{
                                 if(!xcode_org_id)
                                     xcode_org_id = default_xcode_org_id
                                 property.set(xcode_org_id_key, xcode_org_id);
-                                var q = `Please enter the CODE_SIGN_IDENTITY for(${m.deviceId}) ${default_xcode_signing_id?'default('+default_xcode_signing_id+')':''}:`;
+                                var q = `Please enter the CODE_SIGN_IDENTITY for device(${m.deviceId}) ${default_xcode_signing_id?'default('+default_xcode_signing_id+')':''}:`;
                                 readline.question(q, async (xcode_signing_id)=>{
                                     if(!xcode_signing_id)
                                         xcode_signing_id = default_xcode_signing_id

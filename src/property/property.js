@@ -11,7 +11,10 @@ class Property {
     } 
 
     get(k){
-        return this._value[k];
+        if(this._value[k] == 'undefined')
+            return null;
+        else 
+            return this._value[k];
     }
 
     set(k, v){

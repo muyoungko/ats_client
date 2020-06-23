@@ -21,10 +21,6 @@ instruments command(Xcode installed) should be available for iOS Test
 
 # instruction
 * Install node  at https://nodejs.org/ko/download/
-* Install appium 
-    ```shell
-    $ npm i - g appium
-    ```
 * python3 -m pip install Appium-Python-Client
     ```shell
     $ python3 -m pip install Appium-Python-Client
@@ -61,7 +57,7 @@ $ source ~/.bash_profile
 $ ats_client
 
 Welcome Auto Test Hub
-Get your client token in here - http://www.autotesthub.co.kr.s3-website.ap-northeast-2.amazonaws.com//#/token
+Get your client token in here - http://www.autotesthub.co.kr.s3-website.ap-northeast-2.amazonaws.com/#/token
 Please enter the client token(default - eyJhbGciOi...) :
 ```
 
