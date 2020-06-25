@@ -113,6 +113,7 @@ const test = async (member_no, token, json) => {
                                 'x-access-token': token,
                                 'content-type':'application/json'
                             },
+                            encoding : null, 
                             json:true,
                             method: 'POST',
                             body:{

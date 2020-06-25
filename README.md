@@ -4,7 +4,7 @@ This is under Developing, but service and function are always live.
 
 Auto test client is for test with real mobile phone which is your own device.
 
-Test Platform : http://www.autotesthub.co.kr.s3-website.ap-northeast-2.amazonaws.com/
+Cloud Real Device Auto Test Platform : http://www.autotesthub.co.kr.s3-website.ap-northeast-2.amazonaws.com/
 
 Create code with web console then execute or schedule it.
 You can use your own device or another's public device. 
