@@ -194,13 +194,14 @@ const checkiOSorAndroidDevice = async (callback) => {
                         if(m.startsWith('model:'))
                             model = m.replace('model:', '');
                     });
-                    
-                    console.log(`Android device found - ${model}(${deviceId})`);
-                    r.push({
-                        os:os,
-                        deviceId:deviceId,
-                        model:model,
-                    })
+                    if(model != 'unknown'){
+                        console.log(`Android device found - ${model}(${deviceId})`);
+                        r.push({
+                            os:os,
+                            deviceId:deviceId,
+                            model:model,
+                        })
+                    }
                 }
             })
 
