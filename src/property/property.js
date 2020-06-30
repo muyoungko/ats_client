@@ -1,5 +1,6 @@
 const fs = require('fs');
 
+const property_path =  `${__dirname}/.property`
 class Property {
     constructor() { 
         if (!Property.instance) { 
@@ -29,12 +30,11 @@ class Property {
             if(k)
                 s+= `${k}=${this._value[k]}\n`;
         });
-        const property_path =  `${__dirname}/.property`
         fs.writeFileSync(property_path, s);
     };
 
     load(){
-        const property_path =  `${__dirname}/.property`
+        console.log(`Load property - ${property_path}`)
         if(!fs.existsSync(property_path)) {
             fs.writeFileSync(property_path, '');
         }
