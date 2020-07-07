@@ -2,7 +2,7 @@
   "production": {
     "mqtt_topic": "http://www.autotesthub.com",
     "host": "http://www.autotesthub.co.kr.s3-website.ap-northeast-2.amazonaws.com/",
-    "api_host": "https://6dyif8jifd.execute-api.ap-northeast-2.amazonaws.com/production"
+    "api_host": "https://10ux241bk4.execute-api.ap-southeast-1.amazonaws.com/production"
   },
   "development": {
     "mqtt_topic": "http://development.autotesthub.com",
