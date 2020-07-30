@@ -233,7 +233,7 @@ const checkiOSorAndroidDevice = async (callback) => {
             
 
             if(r.length == 0){
-                console.log(`No devices are connected check your command 'adb decices -l' or command 'instruments -s devices'`);
+                console.log(`No devices are connected check your command 'adb devices -l' or command 'instruments -s devices'`);
                 // console.log('adb command not found');
                 // console.log('Please install android studio sdk');
                 // console.log('Or export path like `export PATH=~/Library/Android/sdk/platform-tools:$PATH`')
