@@ -207,26 +207,18 @@ const checkiOSorAndroidDevice = async (callback) => {
 
             var lines2 = stdout2.split('\n');
             lines2.map(line2 => {
+                
                 if(line2 && !line2.startsWith('Known Devices:')
-                    && line2.includes('(') && !line2.includes('Simulator')){
+                    && !line2.includes('(') && !line2.includes('Simulator')){
                     const os = 'ios';
 
-                    var name = line2.split(' (')[0];
-                    var regExp = /\(([^)]+)\)/;
-                    var matches = regExp.exec(line2);
-                    var version = matches[0].substring(1, matches[0].length -1);
-                    var model = name;
-
-                    var regExp2 = /\[([^)]+)\]/;
-                    var matches2 = regExp2.exec(line2);
-                    var deviceId = matches2[0].substring(1, matches2[0].length -1);
-
-                    console.log(`iOS device found - ${model} ${version} (${deviceId})`);
+                    var name = line2.split(' [')[0];
+                    var deviceId = line2.split(' [')[1].replace(']', '');
+                    console.log(`iOS device found - ${name} (${deviceId})`);
                     r.push({
                         os:os,
                         deviceId:deviceId,
-                        model:model,
-                        version:version,
+                        model:name,
                     })
                 }
             })

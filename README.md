@@ -61,6 +61,23 @@ Please enter the client token(default - eyJhbGciOi...) :
 
 
 # Trouble Shooting
-Prepareing...
+
+* When iphone excution failed with provisioning problem
+Xcode 열기
+open /usr/local/lib/node_modules/ats_client/node_modules/appium/node_modules/appium-webdriveragent/WebDriverAgent.xcodeproj
+좌상단 WebDriverAgent > Targets > WebDriverAgentRunner 
+상단 탭 > Build Settings > all | combinded
+
+설정값 변경
+Signing > Developopment Team 을 muyoungko로
+Signing > Code Signing Style을 Manual로
+Signing > Provisioning Profile 을 wildcard3으로
+
+
+좌상단 WebDriverAgent > Targets > WebDriverAgentRunner 에서 했던 설정을 
+좌상단 WebDriverAgent > Targets > IntegrationApp도 
+
+좌상단 Play 버튼우측에 자신의 기기를 선택한후 Play버튼 클릭해서 성공하면 끝
+
 
 
