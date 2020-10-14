@@ -32,7 +32,7 @@ const appiumSessionChecker = async (device_id, appium_session_id) => {
             } else {
                 const json = JSON.parse(body);
                 if(json.value && json.value.length > 0 && json.value[json.value.length-1].id === sessionManager.getCurrectAppiumSessonId(device_id)) {
-                    console.log(`appiumSessionChecker alive ${device_id}`);
+                    console.log(`appiumSessionChecker alive ${device_id} ${appium_session_id}`);
                     setTimeout(appiumSessionChecker, 10000, device_id, appium_session_id);
                 } else { 
                     appiumSessionTerminateToFront(device_id, appium_session_id);
