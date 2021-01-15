@@ -14,6 +14,7 @@ const topic = require('./src/mqtt/topic.js');
 const sessionManager = require('./src/test_session/SessionManager.js');
 const Appium = require('appium')
 const fs = require('fs');
+const { exec } = require('child_process');
 
 var mqtt_client;
 const getMqttClientInstance = (mqtt_host, mqtt_host_port) => {
@@ -46,12 +47,17 @@ const mqttClientAccess = (token, callback) => {
                 console.log("message is "+ message);
 
                 const json = JSON.parse(message);
-                if(json.path === '/test') {
-                    api.test(member_no, token, json);
-                } else if(json.path === '/query') {
-                    const pyshell = sessionManager.getSession(json.test_session_id);
-                    if(pyshell)
-                        pyshell.send(json.command);
+                console.log("device_id "+ json.device_id);
+                if(connectedDeviceList.filter(m=>m.deviceId == json.device_id).length > 0){
+                    if(json.path === '/test') {
+                        api.test(member_no, token, json);
+                    } else if(json.path === '/query') {
+                        const pyshell = sessionManager.getSession(json.test_session_id);
+                        if(pyshell)
+                            pyshell.send(json.command);
+                    }
+                } else {
+                    console.log("device_id "+ json.device_id + ' is not mine');
                 }
             });
             callback(json);
@@ -257,10 +263,10 @@ const checkiOSorAndroidDevice = async (callback) => {
 const deviceStart = async (token, os, deviceId, model, version, system_port, appium_port) => {
     const appium_server_key = `${deviceId}_appium_server`;
     var appium_server_uri = `http://127.0.0.1:${appium_port}`;
-    if(property.get(appium_server_key)){
-        appium_server_uri = property.get(appium_server_key);
-        appium_port = parseInt(appium_server_uri.split(':')[2]);
-    }
+    // if(property.get(appium_server_key)){
+    //     appium_server_uri = property.get(appium_server_key);
+    //     appium_port = parseInt(appium_server_uri.split(':')[2]);
+    // }
 
     const xcode_org_id_key = `${deviceId}_xcode_org_id`;
     const xcode_signing_id_key = `${deviceId}_xcode_signing_id`;

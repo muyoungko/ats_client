@@ -1,6 +1,6 @@
 {
   "name": "ats_client",
-  "version": "0.0.43",
+  "version": "0.0.45",
   "description": "Real Device Auto Tester for Android, iOS",
   "main": "index.js",
   "bin": "index.js",
@@ -20,7 +20,7 @@
   },
   "homepage": "https://github.com/muyoungko/ats_client#readme",
   "dependencies": {
-    "appium": "^1.17.1",
+    "appium": "^1.18.3",
     "appium-doctor": "^1.15.3",
     "mqtt": "^3.0.0",
     "python-shell": "^1.0.8",
