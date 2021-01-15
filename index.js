@@ -14,7 +14,6 @@ const topic = require('./src/mqtt/topic.js');
 const sessionManager = require('./src/test_session/SessionManager.js');
 const Appium = require('appium')
 const fs = require('fs');
-const { exec } = require('child_process');
 
 var mqtt_client;
 const getMqttClientInstance = (mqtt_host, mqtt_host_port) => {
