@@ -84,7 +84,7 @@ const start = async function(){
     //const AppiumDoctor = require('appium-doctor')
     //console.log('AppiumDoctor result');
     //console.log('AppiumDoctor result' , AppiumDoctor);
-
+ 
     process.stdin.setRawMode(true);
     process.stdin.on("keypress", function(chunk, key) {
     if(key && (key.name === "c" || key.name === "z") && key.ctrl) {
@@ -307,7 +307,8 @@ const deviceStatus = async (token, deviceId, appium_server, os, model, version, 
         }
 
         const path = `/device_status?os=${os}&device_id=${deviceId}&model=${encodeURI(model)}&appium_version=${appium_version}&status_appium=${status_appium}&status_connected=${status_connected}&local_appium_server=${appium_server}&version=${version}&system_port=${system_port}`
-                    + `&xcode_org_id=${xcode_org_id}&xcode_signing_id=${xcode_signing_id}&xcconfig_path=${xcconfig_path}`;
+                    + `&xcode_org_id=${xcode_org_id}&xcode_signing_id=${xcode_signing_id}&xcconfig_path=${encodeURI(xcconfig_path)}`;
+     
         client.req(path, function(json){
                 
         });
