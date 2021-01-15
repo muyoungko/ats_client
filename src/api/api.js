@@ -68,6 +68,7 @@ const test = async (member_no, token, json) => {
                 */
                 let options = {
                     mode: 'text',
+                    pythonPath: 'python',
                     pythonOptions: ['-u'], // get print results in real-time
                     args: ['value1', 'value2', 'value3']
                 };
@@ -77,7 +78,6 @@ const test = async (member_no, token, json) => {
                 const filename = `test_${test_session_id}.py`; 
                 fs = require('fs');
                 fs.writeFileSync(filename, code, 'utf8')            
-                
                 let pyshell = new PythonShell(filename, options);
                 sessionManager.putSession(test_session_id, pyshell);
                 var results = [];
