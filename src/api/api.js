@@ -69,6 +69,7 @@ const test = async (member_no, token, json) => {
                 let options = {
                     mode: 'text',
                     pythonPath: 'python',
+                    encoding: 'utf8',
                     pythonOptions: ['-u'], // get print results in real-time
                     args: ['value1', 'value2', 'value3']
                 };
