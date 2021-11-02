@@ -1,12 +1,12 @@
 {
   "production": {
     "mqtt_topic": "http://www.autotesthub.com",
-    "host": "http://www.autotesthub.co.kr.s3-website.ap-northeast-2.amazonaws.com/",
-    "api_host": "https://10ux241bk4.execute-api.ap-southeast-1.amazonaws.com/production"
+    "host": "https://dev-autotesthub.11stcorp.com",
+    "api_host": "https://dev-api-autotesthub.11stcorp.com"
   },
   "development": {
-    "mqtt_topic": "http://development.autotesthub.com",
-    "host": "http://localhost:3000",
-    "api_host": "http://localhost:3110"
+    "mqtt_topic": "http://www.autotesthub.com",
+    "host": "https://dev-autotesthub.11stcorp.com",
+    "api_host": "https://dev-api-autotesthub.11stcorp.com"
   }
 }

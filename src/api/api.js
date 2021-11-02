@@ -55,6 +55,7 @@ const test = async (member_no, token, json) => {
         if(json.r){
             try{
                 var code = json.data.code
+                
                 const device_id = json.data.device_id;
 
                 //test_session_id
@@ -78,6 +79,7 @@ const test = async (member_no, token, json) => {
 
                 const filename = `test_${test_session_id}.py`; 
                 fs = require('fs');
+                console.log(code)
                 fs.writeFileSync(filename, code, 'utf8')            
                 let pyshell = new PythonShell(filename, options);
                 sessionManager.putSession(test_session_id, pyshell);

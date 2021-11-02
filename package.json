@@ -1,6 +1,6 @@
 {
   "name": "ats_client",
-  "version": "0.0.45",
+  "version": "0.0.47",
   "description": "Real Device Auto Tester for Android, iOS",
   "main": "index.js",
   "bin": "index.js",
