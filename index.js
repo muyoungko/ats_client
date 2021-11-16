@@ -33,9 +33,12 @@ const mqttClientAccess = (token, callback) => {
     client.req('/token/me', function(json){
         if(json){
             const member_no = json.member_no
+            console.log('api_host', config.api_host)
+            console.log('mqtt_host', json.mqtt_host)
+            console.log('mqtt_host_port', json.mqtt_host_port)
             const mqtt_client = getMqttClientInstance(json.mqtt_host, json.mqtt_host_port);
             mqtt_client.on("connect", () => {	
-                //console.log("mqtt client connected "+ mqtt_client.connected);
+                console.log("mqtt client connected "+ mqtt_client.connected);
             });
 
             const topicName = topic.topicClientOfMember(member_no);
@@ -318,7 +321,7 @@ const deviceStatus = async (token, deviceId, appium_server, os, model, version, 
                 
         });
 
-        setTimeout(deviceStatus, 60000, token, deviceId, appium_server, os, model, version, system_port, xcode_org_id, xcode_signing_id, xcconfig_path);
+        setTimeout(deviceStatus, 120000, token, deviceId, appium_server, os, model, version, system_port, xcode_org_id, xcode_signing_id, xcconfig_path);
     });  
         
 };
